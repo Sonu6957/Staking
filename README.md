@@ -11,6 +11,6 @@ Instead of Eth, the transaction is controlled with the amount of the token stake
 * Step 4: Transfer some reward tokens and approve the staking contract to transact on behalf of both ERC20 and NFT contracts.
 * Step 5: Stake the required token for a certain period of time and unstake to recieve the reward.
 ## Contract Verification
-Here are the links for the contract verification and transactions on each
+Here are the steps for the contract deployment and testing of the contracts
 * Run the scripts/deploy.js script to deploy the contracts.
 * Run the test to check the deployment of the contracts.
