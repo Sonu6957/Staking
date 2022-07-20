@@ -21,14 +21,19 @@ contract staking is ERC1155Holder{
         uint startingTime;
         address owner; 
      }
-    mapping(uint=>uint) public stakingIdOftokenId;    //To staking
-    mapping(uint=>mapping (uint=>staker)) public stakerofStakingId;
+    mapping(uint=>uint) public stakingIdOftokenId;                      //To keep track tokenId with staking by a user
+    mapping(uint=>mapping (uint=>staker)) public stakerofStakingId;     //To track tokenId with the user details 
 
     // staking 1 NFT for 1 day would reward 5 tokens.
     // Therefore,total staking for 365 days would be 365*5 = 1825 tokens.
     
+    //Staking Interest rates:- Less than a month =0
+                              //Between 1 month to 6 months = 5%
+                             //Between 6 month to 12 months = 10%
+                            //After 12 months = 15%
+    
     uint EmissionRate = (5*10**18)/uint(1 days);
-    uint[] rates = [5,10,15];
+    uint[] rates = [5,10,15];                                            
 
     function stakedAmountofId(uint _id,uint _stakingId) public view returns(uint) {
         return stakerofStakingId[_id][_stakingId].stakedamount;
@@ -38,12 +43,12 @@ contract staking is ERC1155Holder{
         nft1155.safeTransferFrom(msg.sender,address(this),_id,_amount,"0x00");
         uint stakingId = stakingIdOftokenId[_id]++;                                 //|
         stakerofStakingId[_id][stakingId].stakedamount=_amount;                     //|
-        stakerofStakingId[_id][stakingId].startingTime=block.timestamp;             //| storing user values in 
+        stakerofStakingId[_id][stakingId].startingTime=block.timestamp;             //| storing user data with each staking
         stakerofStakingId[_id][stakingId].owner = msg.sender;
         
     }
 
-    function tokenCalculator(uint _amount,uint _elapsedTime) public view returns(uint){
+    function tokenCalculator(uint _amount,uint _elapsedTime) public view returns(uint){    //Calculation of token to reward
         uint reward = 0;
         if(_elapsedTime<30 days){      //30 days
             reward = 0;
@@ -68,10 +73,7 @@ contract staking is ERC1155Holder{
             return reward;
         }
     }
-    function currentTime() public view returns (uint){
-        return block.timestamp;
-    }
-    function unstake(uint _tokenid,uint _stakeId) public returns(uint){
+    function unstake(uint _tokenid,uint _stakeId) public returns(uint){      //Unstaking of the given stake
         require(stakerofStakingId[_tokenid][_stakeId].owner==msg.sender,"You are not the owner");
         require(stakerofStakingId[_tokenid][_stakeId].stakedamount>0,"Not enough staking");
         uint startTime =stakerofStakingId[_tokenid][_stakeId].startingTime;
